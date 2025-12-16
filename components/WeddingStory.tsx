@@ -6,29 +6,52 @@ const WeddingStory: React.FC<WeddingStoryProps> = ({ steps, frames }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [images, setImages] = useState<HTMLImageElement[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [activeStepIndex, setActiveStepIndex] = useState(0);
 
   // 1. Preload all images for smooth scrubbing
   useEffect(() => {
     let isMounted = true;
     const loadImages = async () => {
+      setIsLoading(true);
+      setError(null);
+      
+      // Load all images, resolving to null if they fail
       const promises = frames.map((src) => {
-        return new Promise<HTMLImageElement>((resolve, reject) => {
+        return new Promise<HTMLImageElement | null>((resolve) => {
           const img = new Image();
           img.src = src;
           img.onload = () => resolve(img);
-          img.onerror = reject;
+          img.onerror = () => {
+            console.warn(`Failed to load frame: ${src}`);
+            resolve(null);
+          };
         });
       });
 
       try {
-        const loadedImgs = await Promise.all(promises);
-        if (isMounted) {
-          setImages(loadedImgs);
+        const loadedResults = await Promise.all(promises);
+        
+        if (!isMounted) return;
+
+        // Filter out failed images
+        const successfulImages = loadedResults.filter((img): img is HTMLImageElement => img !== null);
+
+        if (successfulImages.length === 0) {
+          setError("Не удалось загрузить кадры. Проверьте путь к файлам.");
           setIsLoading(false);
+          return;
         }
+
+        // If we have at least one image, we can proceed
+        setImages(successfulImages);
+        setIsLoading(false);
       } catch (err) {
-        console.error("Failed to load frames", err);
+        console.error("Critical error loading frames", err);
+        if (isMounted) {
+            setError("Ошибка при загрузке изображений.");
+            setIsLoading(false);
+        }
       }
     };
 
@@ -79,9 +102,7 @@ const WeddingStory: React.FC<WeddingStoryProps> = ({ steps, frames }) => {
       const viewportHeight = window.innerHeight;
       
       // Calculate how far we've scrolled into the container
-      // Start slightly before 0 to catch the first frame early
       const startY = rect.top; 
-      const endY = rect.bottom - viewportHeight;
       const totalDistance = rect.height - viewportHeight;
 
       // 0.0 to 1.0 progress within the container
@@ -90,14 +111,16 @@ const WeddingStory: React.FC<WeddingStoryProps> = ({ steps, frames }) => {
       // Clamp progress
       progress = Math.max(0, Math.min(1, progress));
 
-      // Calculate frame index
+      // Calculate frame index based on AVAILABLE images
+      const totalFrames = images.length;
+      if (totalFrames === 0) return;
+
       const frameIndex = Math.min(
-        frames.length - 1,
-        Math.floor(progress * frames.length)
+        totalFrames - 1,
+        Math.floor(progress * totalFrames)
       );
 
-      // Determine active text step based on progress buckets
-      // e.g., if there are 5 steps, step 0 is 0-20%, step 1 is 20-40%, etc.
+      // Determine active text step
       const stepIndex = Math.min(
         steps.length - 1,
         Math.floor(progress * steps.length)
@@ -130,7 +153,7 @@ const WeddingStory: React.FC<WeddingStoryProps> = ({ steps, frames }) => {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', handleResize);
     };
-  }, [isLoading, images, frames.length, steps.length]);
+  }, [isLoading, images, steps.length]);
 
   if (isLoading) {
     return (
@@ -140,9 +163,23 @@ const WeddingStory: React.FC<WeddingStoryProps> = ({ steps, frames }) => {
     );
   }
 
+  if (error || images.length === 0) {
+    return (
+      <div className="h-screen w-full flex items-center justify-center bg-black text-white px-6 text-center">
+        <div>
+           <p className="text-red-400 mb-2 font-medium">Что-то пошло не так</p>
+           <p className="text-stone-400 text-sm max-w-md mx-auto">{error}</p>
+           <p className="text-stone-600 text-xs mt-4">
+             Проверьте консоль браузера для деталей (F12). <br/>
+             Убедитесь, что файлы 1.png...61.png доступны.
+           </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     // Height determines the speed of playback. Taller = slower animation.
-    // 500vh means user scrolls 5 screen heights to play the full sequence.
     <div ref={containerRef} className="relative w-full h-[500vh] bg-black">
       
       {/* Sticky Canvas Container */}

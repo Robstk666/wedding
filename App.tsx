@@ -43,14 +43,16 @@ function App() {
 
   // 2. Frame Sequence Generation
   // ИНСТРУКЦИЯ:
-  // 1. Создайте папку "frames" рядом с файлом index.html
-  // 2. Положите туда ваши фото, переименовав их в 1.png, 2.png, ..., 100.png
+  // Для корректной работы в большинстве React-проектов (Vite, CRA):
+  // 1. Создайте папку "frames" внутри папки "public". 
+  //    (Итоговый путь: project_root/public/frames/1.png ...)
+  // 2. Если папки "public" нет, создайте папку "frames" в корне проекта.
   const frames = useMemo(() => {
-    const frameCount = 100; // Укажите здесь точное количество ваших фотографий
+    const frameCount = 61; // Количество кадров
     
     return Array.from({ length: frameCount }, (_, i) => {
-      // Генерирует пути: ./frames/1.png, ./frames/2.png ...
-      return `./frames/${i + 1}.png`; 
+      // Путь начинается с /frames, что указывает на корень домена (обычно public folder)
+      return `/frames/${i + 1}.png`; 
     });
   }, []);
 
