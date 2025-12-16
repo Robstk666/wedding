@@ -18,7 +18,7 @@ const Hero: React.FC = () => {
         <p className="text-stone-500">Санкт-Петербург, Villa d'Este</p>
       </div>
 
-      <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex flex-col items-center animate-bounce duration-[2000ms]">
+      <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex flex-col items-center animate-float">
         <p className="text-xs text-stone-400 mb-2 uppercase tracking-widest">Программа</p>
         <ArrowDown className="text-stone-400 w-5 h-5" />
       </div>

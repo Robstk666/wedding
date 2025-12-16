@@ -197,15 +197,15 @@ const WeddingStory: React.FC<WeddingStoryProps> = ({ steps, frames }) => {
         {steps.map((step, index) => (
           <div
             key={step.id}
-            className={`sticky top-0 h-screen flex items-center justify-center transition-all duration-700 p-6 ${
+            className={`sticky top-0 h-screen flex items-center justify-center transition-all duration-1000 p-6 ${
               activeStepIndex === index 
-                ? 'opacity-100 translate-y-0 scale-100' 
-                : 'opacity-0 translate-y-8 scale-95'
+                ? 'opacity-100 translate-y-0 scale-100 blur-none'
+                : 'opacity-0 translate-y-12 scale-90 blur-sm'
             }`}
           >
             {/* Glassmorphism Card */}
-            <div className="max-w-md w-full bg-black/40 backdrop-blur-md border border-white/10 p-10 rounded-2xl text-center shadow-2xl">
-              <span className="inline-block px-3 py-1 mb-4 text-[10px] font-bold tracking-widest text-white uppercase bg-white/10 rounded-full border border-white/20">
+            <div className="max-w-md w-full bg-black/30 backdrop-blur-xl border border-white/10 p-12 rounded-3xl text-center shadow-2xl transition-transform duration-500">
+              <span className="inline-block px-3 py-1 mb-6 text-[10px] font-semibold tracking-[0.2em] text-white uppercase bg-white/10 rounded-full border border-white/10">
                 {step.time}
               </span>
               <h3 className="text-3xl md:text-4xl font-serif text-white mb-4">
