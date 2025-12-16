@@ -11,30 +11,30 @@ const Rsvp: React.FC = () => {
 
         <form className="space-y-6 text-left" onSubmit={(e) => e.preventDefault()}>
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-stone-700 mb-2">Ваше имя</label>
+            <label htmlFor="name" className="block text-xs font-semibold uppercase tracking-widest text-stone-500 mb-2">Ваше имя</label>
             <input 
               type="text" 
               id="name"
-              className="w-full px-4 py-4 rounded-xl bg-white border border-stone-200 focus:border-stone-400 focus:ring-0 outline-none transition-all shadow-sm text-lg"
+              className="w-full px-4 py-4 rounded-xl bg-stone-50 border-0 focus:bg-white focus:ring-1 focus:ring-stone-300 outline-none transition-all duration-300 text-lg placeholder-stone-400"
               placeholder="Иван и Мария"
             />
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-             <div>
-              <label htmlFor="guests" className="block text-sm font-medium text-stone-700 mb-2">Гостей</label>
-              <select id="guests" className="w-full px-4 py-4 rounded-xl bg-white border border-stone-200 focus:border-stone-400 focus:ring-0 outline-none transition-all shadow-sm text-lg appearance-none">
+             <div className="relative">
+              <label htmlFor="guests" className="block text-xs font-semibold uppercase tracking-widest text-stone-500 mb-2">Гостей</label>
+              <select id="guests" className="w-full px-4 py-4 rounded-xl bg-stone-50 border-0 focus:bg-white focus:ring-1 focus:ring-stone-300 outline-none transition-all duration-300 text-lg appearance-none text-[#1D1D1F]">
                 <option>Я приду один/одна</option>
                 <option>Нас будет двое</option>
                 <option>К сожалению, не смогу</option>
               </select>
             </div>
             <div>
-              <label htmlFor="food" className="block text-sm font-medium text-stone-700 mb-2">Предпочтения по еде</label>
+              <label htmlFor="food" className="block text-xs font-semibold uppercase tracking-widest text-stone-500 mb-2">Предпочтения по еде</label>
               <input 
                 type="text" 
                 id="food"
-                className="w-full px-4 py-4 rounded-xl bg-white border border-stone-200 focus:border-stone-400 focus:ring-0 outline-none transition-all shadow-sm text-lg"
+                className="w-full px-4 py-4 rounded-xl bg-stone-50 border-0 focus:bg-white focus:ring-1 focus:ring-stone-300 outline-none transition-all duration-300 text-lg placeholder-stone-400"
                 placeholder="Аллергии, веган..."
               />
             </div>
@@ -42,7 +42,7 @@ const Rsvp: React.FC = () => {
 
           <button 
             type="submit"
-            className="w-full bg-[#1D1D1F] text-white font-medium text-lg py-5 rounded-xl hover:bg-stone-800 transition-colors mt-8 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 duration-200"
+            className="w-full bg-[#1D1D1F] text-white font-medium text-lg py-5 rounded-xl hover:bg-stone-800 transition-all duration-300 mt-8 hover:scale-[1.02] active:scale-[0.98]"
           >
             Подтвердить участие
           </button>
