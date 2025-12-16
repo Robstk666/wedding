@@ -42,23 +42,15 @@ function App() {
   ], []);
 
   // 2. Frame Sequence Generation
-  // In a real scenario, you would list your files here:
-  // const frames = ['/img/frame_001.jpg', '/img/frame_002.jpg', ...];
-  // Below we simulate 100 frames by repeating 5 placeholder images.
+  // ИНСТРУКЦИЯ:
+  // 1. Создайте папку "frames" рядом с файлом index.html
+  // 2. Положите туда ваши фото, переименовав их в 1.jpg, 2.jpg, ..., 100.jpg
   const frames = useMemo(() => {
-    const frameCount = 100; // How many frames you have
-    const baseImages = [
-      'https://picsum.photos/id/433/1920/1080', // Garden/Gathering
-      'https://picsum.photos/id/314/1920/1080', // Ceremony/Flowers
-      'https://picsum.photos/id/250/1920/1080', // Camera/Details
-      'https://picsum.photos/id/453/1920/1080', // Party/Music
-      'https://picsum.photos/id/292/1920/1080', // Food/Cake
-    ];
-
+    const frameCount = 100; // Укажите здесь точное количество ваших фотографий
+    
     return Array.from({ length: frameCount }, (_, i) => {
-      // Logic to switch image every 20 frames to simulate a sequence
-      const imageIndex = Math.floor(i / (frameCount / baseImages.length));
-      return baseImages[Math.min(imageIndex, baseImages.length - 1)];
+      // Генерирует пути: ./frames/1.jpg, ./frames/2.jpg ...
+      return `./frames/${i + 1}.jpg`; 
     });
   }, []);
 
