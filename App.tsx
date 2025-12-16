@@ -44,13 +44,13 @@ function App() {
   // 2. Frame Sequence Generation
   // ИНСТРУКЦИЯ:
   // 1. Создайте папку "frames" рядом с файлом index.html
-  // 2. Положите туда ваши фото, переименовав их в 1.jpg, 2.jpg, ..., 100.jpg
+  // 2. Положите туда ваши фото, переименовав их в 1.png, 2.png, ..., 100.png
   const frames = useMemo(() => {
     const frameCount = 100; // Укажите здесь точное количество ваших фотографий
     
     return Array.from({ length: frameCount }, (_, i) => {
-      // Генерирует пути: ./frames/1.jpg, ./frames/2.jpg ...
-      return `./frames/${i + 1}.jpg`; 
+      // Генерирует пути: ./frames/1.png, ./frames/2.png ...
+      return `./frames/${i + 1}.png`; 
     });
   }, []);
 
