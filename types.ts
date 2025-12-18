@@ -3,9 +3,9 @@ export interface ProgramStep {
   time: string;
   title: string;
   description: string;
+  image: string;
 }
 
 export interface WeddingStoryProps {
   steps: ProgramStep[];
-  frames: string[]; // Array of image URLs for the sequence
 }
