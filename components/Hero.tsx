@@ -8,8 +8,8 @@ const Hero: React.FC = () => {
         <p className="text-sm md:text-base tracking-[0.2em] text-stone-500 uppercase mb-6">
           Приглашение
         </p>
-        <h1 className="text-5xl md:text-8xl font-medium text-[#1D1D1F] mb-4 leading-tight">
-          Анна <span className="italic text-stone-400">&</span> Сергей
+        <h1 className="text-6xl md:text-9xl font-serif text-[#1D1D1F] mb-6 leading-tight tracking-tight">
+          Анна <span className="font-light italic text-stone-400">&</span> Сергей
         </h1>
         <div className="h-px w-24 bg-stone-300 mx-auto my-8"></div>
         <p className="text-xl md:text-2xl font-light text-stone-600 mb-2">

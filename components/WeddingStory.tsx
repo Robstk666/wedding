@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ProgramStep, WeddingStoryProps } from '../types';
 
 const WeddingStory: React.FC<WeddingStoryProps> = ({ steps, frames }) => {
@@ -9,14 +10,13 @@ const WeddingStory: React.FC<WeddingStoryProps> = ({ steps, frames }) => {
   const [error, setError] = useState<string | null>(null);
   const [activeStepIndex, setActiveStepIndex] = useState(0);
 
-  // 1. Preload all images for smooth scrubbing
+  // 1. Preload all images
   useEffect(() => {
     let isMounted = true;
     const loadImages = async () => {
       setIsLoading(true);
       setError(null);
       
-      // Load all images, resolving to null if they fail
       const promises = frames.map((src) => {
         return new Promise<HTMLImageElement | null>((resolve) => {
           const img = new Image();
@@ -34,7 +34,6 @@ const WeddingStory: React.FC<WeddingStoryProps> = ({ steps, frames }) => {
         
         if (!isMounted) return;
 
-        // Filter out failed images
         const successfulImages = loadedResults.filter((img): img is HTMLImageElement => img !== null);
 
         if (successfulImages.length === 0) {
@@ -43,7 +42,6 @@ const WeddingStory: React.FC<WeddingStoryProps> = ({ steps, frames }) => {
           return;
         }
 
-        // If we have at least one image, we can proceed
         setImages(successfulImages);
         setIsLoading(false);
       } catch (err) {
@@ -70,7 +68,6 @@ const WeddingStory: React.FC<WeddingStoryProps> = ({ steps, frames }) => {
 
       if (!canvas || !ctx || !img) return;
 
-      // Handle "object-fit: cover" logic for canvas
       const w = canvas.width;
       const h = canvas.height;
       const iw = img.width;
@@ -80,13 +77,11 @@ const WeddingStory: React.FC<WeddingStoryProps> = ({ steps, frames }) => {
       let nh = ih * r;
       let ar = 1;
 
-      // Decide which gap to fill to cover the area
       if (nw < w) ar = w / nw;
       if (Math.abs(ar - 1) < 1e-14 && nh < h) ar = h / nh;
       nw *= ar;
       nh *= ar;
 
-      // Center the image
       const x = (w - nw) / 2;
       const y = (h - nh) / 2;
 
@@ -101,17 +96,12 @@ const WeddingStory: React.FC<WeddingStoryProps> = ({ steps, frames }) => {
       const rect = container.getBoundingClientRect();
       const viewportHeight = window.innerHeight;
       
-      // Calculate how far we've scrolled into the container
       const startY = rect.top; 
       const totalDistance = rect.height - viewportHeight;
 
-      // 0.0 to 1.0 progress within the container
       let progress = (0 - startY) / totalDistance;
-      
-      // Clamp progress
       progress = Math.max(0, Math.min(1, progress));
 
-      // Calculate frame index based on AVAILABLE images
       const totalFrames = images.length;
       if (totalFrames === 0) return;
 
@@ -120,7 +110,7 @@ const WeddingStory: React.FC<WeddingStoryProps> = ({ steps, frames }) => {
         Math.floor(progress * totalFrames)
       );
 
-      // Determine active text step
+      // Determine active text step with a bit more buffer at the start/end
       const stepIndex = Math.min(
         steps.length - 1,
         Math.floor(progress * steps.length)
@@ -128,26 +118,22 @@ const WeddingStory: React.FC<WeddingStoryProps> = ({ steps, frames }) => {
       
       setActiveStepIndex(stepIndex);
 
-      // Render using RequestAnimationFrame for performance
       requestAnimationFrame(() => renderFrame(frameIndex));
     };
 
-    // Initial render
     renderFrame(0);
 
-    // Initial resize to fill screen
     const handleResize = () => {
       if (canvasRef.current) {
         canvasRef.current.width = window.innerWidth;
         canvasRef.current.height = window.innerHeight;
-        // Re-render current frame after resize
         handleScroll(); 
       }
     };
     
     window.addEventListener('scroll', handleScroll);
     window.addEventListener('resize', handleResize);
-    handleResize(); // trigger once
+    handleResize();
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
@@ -169,54 +155,70 @@ const WeddingStory: React.FC<WeddingStoryProps> = ({ steps, frames }) => {
         <div>
            <p className="text-red-400 mb-2 font-medium">Что-то пошло не так</p>
            <p className="text-stone-400 text-sm max-w-md mx-auto">{error}</p>
-           <p className="text-stone-600 text-xs mt-4">
-             Проверьте консоль браузера для деталей (F12). <br/>
-             Убедитесь, что файлы 1.png...61.png доступны.
-           </p>
         </div>
       </div>
     );
   }
 
   return (
-    // Height determines the speed of playback. Taller = slower animation.
     <div ref={containerRef} className="relative w-full h-[500vh] bg-black">
-      
-      {/* Sticky Canvas Container */}
       <div className="sticky top-0 left-0 w-full h-screen overflow-hidden">
         <canvas 
           ref={canvasRef} 
           className="block w-full h-full"
         />
-        {/* Cinematic Overlay */}
-        <div className="absolute inset-0 bg-black/30 pointer-events-none" />
+        <div className="absolute inset-0 bg-black/20 pointer-events-none" />
       </div>
 
-      {/* Floating Text Steps */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
-        {steps.map((step, index) => (
-          <div
-            key={step.id}
-            className={`sticky top-0 h-screen flex items-center justify-center transition-all duration-1000 p-6 ${
-              activeStepIndex === index 
-                ? 'opacity-100 translate-y-0 scale-100 blur-none'
-                : 'opacity-0 translate-y-12 scale-90 blur-sm'
-            }`}
-          >
-            {/* Glassmorphism Card */}
-            <div className="max-w-md w-full bg-black/30 backdrop-blur-xl border border-white/10 p-12 rounded-3xl text-center shadow-2xl transition-transform duration-500">
-              <span className="inline-block px-3 py-1 mb-6 text-[10px] font-semibold tracking-[0.2em] text-white uppercase bg-white/10 rounded-full border border-white/10">
-                {step.time}
-              </span>
-              <h3 className="text-3xl md:text-4xl font-serif text-white mb-4">
-                {step.title}
-              </h3>
-              <p className="text-base text-stone-200 leading-relaxed font-light">
-                {step.description}
-              </p>
+        {steps.map((step, index) => {
+          const isActive = activeStepIndex === index;
+          return (
+            <div
+              key={step.id}
+              className="sticky top-0 h-screen flex items-center justify-center p-6 overflow-hidden"
+            >
+              <AnimatePresence mode='wait'>
+                {isActive && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95, y: 20, filter: "blur(10px)" }}
+                    animate={{ opacity: 1, scale: 1, y: 0, filter: "blur(0px)" }}
+                    exit={{ opacity: 0, scale: 1.05, y: -20, filter: "blur(10px)" }}
+                    transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} // Apple-like ease
+                    className="max-w-md w-full bg-black/40 backdrop-blur-2xl border border-white/10 p-12 rounded-3xl text-center shadow-2xl"
+                  >
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2, duration: 0.6 }}
+                      className="inline-block px-3 py-1 mb-6 text-[10px] font-semibold tracking-[0.2em] text-white uppercase bg-white/10 rounded-full border border-white/10"
+                    >
+                      {step.time}
+                    </motion.div>
+
+                    <motion.h3
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.3, duration: 0.6 }}
+                      className="text-4xl md:text-5xl font-serif text-white mb-6 tracking-tight"
+                    >
+                      {step.title}
+                    </motion.h3>
+
+                    <motion.p
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.4, duration: 0.6 }}
+                      className="text-lg text-stone-200 leading-relaxed font-light"
+                    >
+                      {step.description}
+                    </motion.p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
